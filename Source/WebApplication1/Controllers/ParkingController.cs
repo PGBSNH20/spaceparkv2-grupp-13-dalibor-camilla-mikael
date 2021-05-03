@@ -72,6 +72,7 @@ namespace WebApplication1.Controllers
                 parking.ShipName = null;
                 parking.Occupied = false;
             }
+            await _context.SaveChangesAsync();
 
             return parking;
         }
