@@ -20,7 +20,7 @@ namespace WebApplication1.Models
 
         public DateTime ArrivalTime { get; set; }
 
-        public DateTime? EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         public decimal Price { get; set; }
 

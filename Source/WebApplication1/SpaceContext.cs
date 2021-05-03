@@ -11,7 +11,7 @@ namespace WebApplication1
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Data Source=(localdb)\ProjectsV13;Initial Catalog=StoreDB;");
+            optionsBuilder.UseSqlServer(@"Server=localhost,31433;Database=SpaceParkV2;User Id=sa;Password=verystrong!pass123;");
         }
         public virtual DbSet<Parkings> Parkings { get; set; }
         public virtual DbSet<Payment> Payments { get; set; }

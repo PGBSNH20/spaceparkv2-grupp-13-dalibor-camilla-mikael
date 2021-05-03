@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Grpc.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,9 +23,8 @@ namespace WebApplication1.Controllers
 
         // GET api/parkings
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Parkings>>> GetParkings()
+        public async Task<ActionResult<IEnumerable<Parkings>>> Get()
         {
-
             return await _context.Parkings.ToListAsync();
         }
 
@@ -36,7 +36,7 @@ namespace WebApplication1.Controllers
 
             if (parking == null)
             {
-                //return NotParked();
+                return NotFound("There is no parkingspot with this ID.");
             }
             return parking;
         }
@@ -49,7 +49,7 @@ namespace WebApplication1.Controllers
 
             if (parking == null)
             {
-                //return NotParked();
+                return NotFound($"Nobody with the name {name} has parked here.");
             }
             return parking;
         }
@@ -72,6 +72,7 @@ namespace WebApplication1.Controllers
                 parking.ShipName = null;
                 parking.Occupied = false;
             }
+            await _context.SaveChangesAsync();
 
             return parking;
         }
