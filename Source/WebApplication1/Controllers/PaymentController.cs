@@ -35,7 +35,6 @@ namespace WebApplication1.Controllers
 
             if (payment == null)
             {
-                return NotFound("Payment does ");
             }
             return payment;
         }
@@ -48,20 +47,14 @@ namespace WebApplication1.Controllers
 
             if (payment == null)
             {
-                return NotFound($"There is no payment for {name}.");
             }
             return payment;
         }
 
         //PUT api/payments
         [HttpPost]
-        public async Task<ActionResult<Payment>> PostPayment([FromBody] Payment payment)
+        public async Task<ActionResult<Payment>> PutPayment([FromBody] Payment payment)
         {
-            var parking = _context.Parkings.FirstOrDefault(p => p.Id == payment.Id);
-            
-            payment.SpacePortId = parking.SpacePortId;
-            payment.PersonName = parking.ParkedBy;
-            payment.SpaceShip = parking.ShipName;
             payment.ArrivalTime = DateTime.Now;
             payment.Payed = false;
 
@@ -79,15 +72,13 @@ namespace WebApplication1.Controllers
 
             if(payment != null)
             {
-                payment.EndTime = DateTime.Now;
-                TimeSpan timeSpan = (payment.EndTime - payment.ArrivalTime);
-                payment.Price = timeSpan.Hours * 5;
-                payment.Payed = true;
+            payment.EndTime = DateTime.Now;
+            payment.Payed = true;
 
-                await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-                return payment;
-            }
+            return payment;
+        }
             return NotFound("Payment not found");
         }
     }
