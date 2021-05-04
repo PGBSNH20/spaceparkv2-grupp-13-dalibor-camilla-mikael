@@ -22,14 +22,8 @@ namespace WebApplication1.Controllers
 
         // GET api/payments
         [HttpGet]
-<<<<<<< HEAD
         public async Task<ActionResult<IEnumerable<Payment>>> Get()
         {
-=======
-        public async Task<ActionResult<IEnumerable<Payment>>> GetParkings()
-        {
-
->>>>>>> 4d1a4a4b3d8d6ed8a5285f13ba23c03ab93d4b2c
             return await _context.Payments.ToListAsync();
         }
 
@@ -41,10 +35,7 @@ namespace WebApplication1.Controllers
 
             if (payment == null)
             {
-<<<<<<< HEAD
-=======
-                //return NotParked();
->>>>>>> 4d1a4a4b3d8d6ed8a5285f13ba23c03ab93d4b2c
+
             }
             return payment;
         }
@@ -57,64 +48,54 @@ namespace WebApplication1.Controllers
 
             if (payment == null)
             {
-<<<<<<< HEAD
-=======
-                //return NotParked();
->>>>>>> 4d1a4a4b3d8d6ed8a5285f13ba23c03ab93d4b2c
+
             }
             return payment;
         }
 
         //PUT api/payments
         [HttpPost]
-<<<<<<< HEAD
-        public async Task<ActionResult<Payment>> PutPayment([FromBody] Payment payment)
+        public IActionResult PutPayment([FromBody] Payment payment)
         {
+            var parking = _context.Parkings.FirstOrDefault(p => p.Id == payment.Id);
+            var spacePort = _context.Spaceports.FirstOrDefault(s => s.Id == parking.SpacePortId);
+
+            _context.Payments.Add(payment);
+            payment.SpacePortId = spacePort.Id;
+            payment.PersonName = parking.ParkedBy;
+            payment.SpaceShip = parking.ShipName;
             payment.ArrivalTime = DateTime.Now;
             payment.Payed = false;
 
             _context.Payments.Add(payment);
-=======
-        public async Task<ActionResult<Payment>> PostPayment(Spaceport spaceport, string name, string ship)
-        {
-            Payment payment = new Payment();
+            _context.SaveChangesAsync();
 
-            payment.SpacePortId = spaceport.Id;
-            payment.PersonName = name;
-            payment.SpaceShip = ship;
-            payment.ArrivalTime = DateTime.Now;
-            payment.Payed = false;
-
->>>>>>> 4d1a4a4b3d8d6ed8a5285f13ba23c03ab93d4b2c
-            await _context.SaveChangesAsync();
-
-            return payment;
+            return StatusCode(StatusCodes.Status201Created, "Payment added.");
         }
 
         //PATCH api/payments/1
         [HttpPatch("{id}")]
-        public async Task<ActionResult<Payment>> PatchPayment(int id)
+        public IActionResult PatchPayment(int id)
         {
-            var payment = await _context.Payments.FindAsync(id);
-
-<<<<<<< HEAD
-            if(payment != null)
+            try
             {
-            payment.EndTime = DateTime.Now;
-=======
-            payment.EndTime = DateTime.Now;
-            payment.Price = (payment.EndTime.Hour - payment.ArrivalTime.Hour) * 5;
->>>>>>> 4d1a4a4b3d8d6ed8a5285f13ba23c03ab93d4b2c
-            payment.Payed = true;
+                var payment = _context.Payments.FirstOrDefault(p => p.Id == id);
+        
+                payment.EndTime = DateTime.Now;
+                payment.EndTime = DateTime.Now;
+                payment.Price = (payment.EndTime.Hour - payment.ArrivalTime.Hour) * 5;
+                payment.Payed = true;
 
-            await _context.SaveChangesAsync();
+                _context.SaveChangesAsync();
 
-            return payment;
+                return StatusCode(StatusCodes.Status201Created, "Payment done.");
+            }
+            
+            catch
+            {
+                return NotFound("Payment not found");
+            }
         }
-<<<<<<< HEAD
-            return NotFound("Payment not found");
-        }
-=======
->>>>>>> 4d1a4a4b3d8d6ed8a5285f13ba23c03ab93d4b2c
+
     }
 }
