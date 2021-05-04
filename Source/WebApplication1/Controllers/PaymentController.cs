@@ -82,8 +82,8 @@ namespace WebApplication1.Controllers
                 var payment = _context.Payments.FirstOrDefault(p => p.Id == id);
         
                 payment.EndTime = DateTime.Now;
-                payment.EndTime = DateTime.Now;
-                payment.Price = (payment.EndTime.Hour - payment.ArrivalTime.Hour) * 5;
+                TimeSpan timeSpan = (payment.EndTime - payment.ArrivalTime);
+                payment.Price = timeSpan.Hours * 5;
                 payment.Payed = true;
 
                 _context.SaveChangesAsync();
