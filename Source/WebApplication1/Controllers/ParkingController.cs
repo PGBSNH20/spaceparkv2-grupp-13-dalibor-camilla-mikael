@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models;
+using WebApplication1.Swapi;
 
 namespace WebApplication1.Controllers
 {
@@ -55,26 +56,86 @@ namespace WebApplication1.Controllers
         }
 
         //PATCH api/parking/1
-        [HttpPatch("{id}")]
-        public async Task<ActionResult<Parkings>> PatchParking(int id, string personName, string shipName)
+        [HttpPatch("[action]/{id}/{personName}/{shipName}")]
+        public async Task<ActionResult> PatchParking(int id, string personName, string shipName)
         {
             var parking = await _context.Parkings.FindAsync(id);
 
-            if (!parking.Occupied)
+            if(parking != null && !parking.Occupied)
             {
-                parking.ParkedBy = personName;
-                parking.ShipName = shipName;
-                parking.Occupied = true;
+                var People = new StarwarsPeople().GetAllPersons(); // Get all starwars characters.
+
+                var Ships = new StarwarsShips().GetAllShips(); // Get all starwars ships.
+
+                var PersonMatch = People.Result.Where(p => p.Name.ToLower() == personName.ToLower()).FirstOrDefault();
+                if(PersonMatch != null)
+                {
+                    var StarshipMatch = Ships.Result.Where(s => s.Name.ToLower() == shipName.ToLower()).FirstOrDefault();
+
+                    if(StarshipMatch != null && StarshipMatch.Length >= parking.MaxLength)
+                    {
+                        parking.ParkedBy = personName;
+                        parking.ShipName = shipName;
+                        parking.Occupied = true;
+
+                        // Add new payment
+                        var payment = new Payment();
+                        payment.SpacePortId = parking.SpacePortId;
+                        payment.ParkingId = parking.Id;
+                        payment.PersonName = parking.ParkedBy;
+                        payment.SpaceShip = parking.ShipName;
+                        payment.ArrivalTime = DateTime.Now;
+                        payment.Payed = false;
+
+                        _context.Payments.Add(payment);
+                        await _context.SaveChangesAsync();
+                        return StatusCode(StatusCodes.Status201Created);
+                    }
+
+                    return BadRequest($"There is no shipmodel named {shipName} or the ship is to big for this parkinglot.");
+                }
+
+                return BadRequest($"No one with the name {personName} participated in any star wars movie.");
             }
-            else
+
+            // Actions for leaving parkinglot and make a payment.
+            if(parking.Occupied)
             {
                 parking.ParkedBy = null;
                 parking.ShipName = null;
                 parking.Occupied = false;
-            }
-            await _context.SaveChangesAsync();
 
-            return parking;
+                // Pay for parking
+                Payment payment = _context.Payments.Where(p => p.ParkingId == parking.Id).FirstOrDefault();
+                payment.EndTime = DateTime.Now;
+                TimeSpan timeParked = (payment.EndTime - payment.ArrivalTime);
+                payment.Price = timeParked.Hours * 5;
+                payment.Payed = true;
+                                                                  
+                await _context.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status201Created);
+            }
+
+            return NotFound("Parking does not exist.");
+        }
+
+        [HttpPost]
+        public IActionResult PutPayment([FromBody] Payment payment)
+        {
+            var parking = _context.Parkings.FirstOrDefault(p => p.Id == payment.Id);
+            var spacePort = _context.Spaceports.FirstOrDefault(s => s.Id == parking.SpacePortId);
+
+            _context.Payments.Add(payment);
+            payment.SpacePortId = spacePort.Id;
+            payment.PersonName = parking.ParkedBy;
+            payment.SpaceShip = parking.ShipName;
+            payment.ArrivalTime = DateTime.Now;
+            payment.Payed = false;
+
+            _context.Payments.Add(payment);
+            _context.SaveChangesAsync();
+
+            return StatusCode(StatusCodes.Status201Created, "Payment added.");
         }
     }
 }

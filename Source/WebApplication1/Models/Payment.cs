@@ -13,7 +13,8 @@ namespace WebApplication1.Models
 
         [ForeignKey("SpacePort")]
         public int SpacePortId { get; set; }
-
+        [ForeignKey("Parkings")]
+        public int ParkingId { get; set; }
         public string PersonName { get; set; }
 
         public string SpaceShip { get; set; }
