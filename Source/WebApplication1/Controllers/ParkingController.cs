@@ -57,23 +57,19 @@ namespace WebApplication1.Controllers
 
         //PATCH api/parking/1
         [HttpPatch("[action]/{id}/{personName}/{shipName}")]
-        public async Task<ActionResult> PatchParking(int id, string personName, string shipName)
+        public async Task<ActionResult> Park(int id, string personName, string shipName)
         {
-            var parking = await _context.Parkings.FindAsync(id);
-
-            if(parking != null && !parking.Occupied)
+            try
             {
-                var People = new StarwarsPeople().GetAllPersons(); // Get all starwars characters.
-
-                var Ships = new StarwarsShips().GetAllShips(); // Get all starwars ships.
+                var parking = await _context.Parkings.FindAsync(id);
+                var People = StarwarsPeople.GetPeople(); // Get all starwars characters.
+                var Ships = StarwarsShips.GetStarships(); // Get all starwars ships.
 
                 var PersonMatch = People.Result.Where(p => p.Name.ToLower() == personName.ToLower()).FirstOrDefault();
-                if(PersonMatch != null)
-                {
-                    var StarshipMatch = Ships.Result.Where(s => s.Name.ToLower() == shipName.ToLower()).FirstOrDefault();
+                var StarshipMatch = Ships.Result.Where(s => s.Name.ToLower() == shipName.ToLower()).FirstOrDefault();
 
-                    if(StarshipMatch != null && StarshipMatch.Length >= parking.MaxLength)
-                    {
+                   if(!parking.Occupied)
+                   {
                         parking.ParkedBy = personName;
                         parking.ShipName = shipName;
                         parking.Occupied = true;
@@ -88,35 +84,57 @@ namespace WebApplication1.Controllers
                         payment.Payed = false;
 
                         _context.Payments.Add(payment);
-                        await _context.SaveChangesAsync();
-                        return StatusCode(StatusCodes.Status201Created);
-                    }
+                   }
 
-                    return BadRequest($"There is no shipmodel named {shipName} or the ship is to big for this parkinglot.");
+                await _context.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status201Created);            
+            }
+
+            catch
+            {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+        }
+
+        //PATCH api/parking/1
+        [HttpPatch("[action]/{id}/{personName}/{shipName}")]
+        public async Task<ActionResult> LeavePark(int id, string personName, string shipName)
+        {
+            try
+            {
+                var parking = await _context.Parkings.FindAsync(id);
+
+                if(!parking.Occupied)
+                {
+                    return BadRequest("This parking has no ship...");
                 }
 
-                return BadRequest($"No one with the name {personName} participated in any star wars movie.");
+                if(parking.ParkedBy.ToLower() == personName.ToLower() && parking.ShipName.ToLower() == shipName.ToLower())
+                {
+                    parking.ParkedBy = null;
+                    parking.ShipName = null;
+                    parking.Occupied = false;
+
+                    // Pay for parking
+                    var payments = await _context.Payments.Where(p => p.ParkingId == parking.Id).ToListAsync();
+                    Payment payment = payments.Where(p => p.Payed == false).FirstOrDefault();
+                    
+                    payment.EndTime = DateTime.Now;
+                    TimeSpan timeParked = (payment.EndTime - payment.ArrivalTime);
+                    payment.Price = timeParked.Hours * parking.Fee;
+                    payment.Payed = true;
+
+                    await _context.SaveChangesAsync();
+                    return StatusCode(StatusCodes.Status201Created);
+                }
+
+                return BadRequest("You dont seam to have parked anything or this kind of ship on this parkinglot.");
             }
 
-            // Actions for leaving parkinglot and make a payment.
-            if(parking.Occupied)
+            catch
             {
-                parking.ParkedBy = null;
-                parking.ShipName = null;
-                parking.Occupied = false;
-
-                // Pay for parking
-                Payment payment = _context.Payments.Where(p => p.ParkingId == parking.Id).FirstOrDefault();
-                payment.EndTime = DateTime.Now;
-                TimeSpan timeParked = (payment.EndTime - payment.ArrivalTime);
-                payment.Price = timeParked.Hours * 5;
-                payment.Payed = true;
-                                                                  
-                await _context.SaveChangesAsync();
-                return StatusCode(StatusCodes.Status201Created);
+                return StatusCode(StatusCodes.Status400BadRequest);
             }
-
-            return NotFound("Parking does not exist.");
         }
 
     }
