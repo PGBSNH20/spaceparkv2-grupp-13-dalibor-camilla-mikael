@@ -26,11 +26,11 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Parkings>>> Get()
         {
-            return await _context.Parkings.ToListAsync();
+            return Ok(await _context.Parkings.ToListAsync());
         }
 
         //GET api/parkings/1
-        [HttpGet("{id}")]
+        [HttpGet("[Action]/{id}")]
         public async Task<ActionResult<Parkings>> GetParking(int id)
         {
             var parking = await _context.Parkings.FindAsync(id);
@@ -43,7 +43,7 @@ namespace WebApplication1.Controllers
         }
 
         //GET api/parking/name
-        [HttpGet("{name}")]
+        [HttpGet("[Action]/{name}")]
         public async Task<ActionResult<IEnumerable<Parkings>>> GetCharacterParking(string name)
         {
             var parking = await _context.Parkings.Where(p => p.ParkedBy == name).ToListAsync();
@@ -119,24 +119,6 @@ namespace WebApplication1.Controllers
             return NotFound("Parking does not exist.");
         }
 
-        [HttpPost]
-        public IActionResult PutPayment([FromBody] Payment payment)
-        {
-            var parking = _context.Parkings.FirstOrDefault(p => p.Id == payment.Id);
-            var spacePort = _context.Spaceports.FirstOrDefault(s => s.Id == parking.SpacePortId);
-
-            _context.Payments.Add(payment);
-            payment.SpacePortId = spacePort.Id;
-            payment.PersonName = parking.ParkedBy;
-            payment.SpaceShip = parking.ShipName;
-            payment.ArrivalTime = DateTime.Now;
-            payment.Payed = false;
-
-            _context.Payments.Add(payment);
-            _context.SaveChangesAsync();
-
-            return StatusCode(StatusCodes.Status201Created, "Payment added.");
-        }
     }
 }
 
