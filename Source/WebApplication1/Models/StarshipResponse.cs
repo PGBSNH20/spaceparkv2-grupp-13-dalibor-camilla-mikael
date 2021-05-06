@@ -8,6 +8,7 @@ namespace WebApplication1.Models
     public class StarshipResponse
     {
         public int Count { get; set; }
+        public string Next { get; set; }
         public List<Starship> Results { get; set; }
     }
 
