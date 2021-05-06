@@ -9,6 +9,12 @@ namespace WebApplication1
 {
     public class SpaceContext : DbContext
     {
+
+        public SpaceContext(DbContextOptions<SpaceContext> options)
+        {
+            
+        }
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"Data Source = (localdb)\MSSQLLocalDB;Initial Catalog = SpaceParkV2; Integrated Security = True;");

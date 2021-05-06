@@ -34,6 +34,7 @@ namespace WebApplication1
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SpaceparkAPI", Version = "v1" });
             });
+            
             services.AddDbContext<SpaceContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
         }
 
