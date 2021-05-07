@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApplication1.Filters;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ApiKeyAuthAttributeUser]
     public class PaymentController : ControllerBase
     {
         private readonly SpaceContext _context;
@@ -35,7 +37,7 @@ namespace WebApplication1.Controllers
 
             if (payment == null)
             {
-
+                return BadRequest("There is no payment with this id.");
             }
             return payment;
         }
@@ -48,7 +50,7 @@ namespace WebApplication1.Controllers
 
             if (payment == null)
             {
-
+                return BadRequest($"There are no payments under the name {name}.");
             }
             return payment;
         }

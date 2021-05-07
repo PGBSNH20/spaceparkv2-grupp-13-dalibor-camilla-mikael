@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApplication1.Filters;
 using WebApplication1.Models;
 using WebApplication1.Swapi;
 
@@ -13,6 +14,7 @@ namespace WebApplication1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ApiKeyAuthAttributeUser]
     public class ParkingController : ControllerBase
     {
         private readonly SpaceContext _context;
