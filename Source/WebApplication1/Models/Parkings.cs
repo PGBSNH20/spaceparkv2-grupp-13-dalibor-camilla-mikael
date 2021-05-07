@@ -14,5 +14,8 @@ namespace WebApplication1.Models
         public bool Occupied { get; set; }
         [MaxLength(50)] public string ParkedBy { get; set; }
         [MaxLength(50)] public string ShipName { get; set; }
+        [Required]
+        public int SpacePortId { get; set; }
+        public virtual Spaceport SpacePort { get; set; }
     }
 }

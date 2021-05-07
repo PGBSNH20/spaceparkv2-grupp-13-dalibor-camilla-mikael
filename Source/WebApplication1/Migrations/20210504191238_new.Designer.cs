@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1;
 
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(SpaceContext))]
-    partial class SpaceContextModelSnapshot : ModelSnapshot
+    [Migration("20210504191238_new")]
+    partial class @new
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,48 +53,6 @@ namespace WebApplication1.Migrations
                     b.HasIndex("SpacePortId");
 
                     b.ToTable("Parkings");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Fee = 10,
-                            MaxLength = 50m,
-                            Occupied = false,
-                            SpacePortId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Fee = 50,
-                            MaxLength = 100m,
-                            Occupied = false,
-                            SpacePortId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Fee = 100,
-                            MaxLength = 200m,
-                            Occupied = false,
-                            SpacePortId = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Fee = 1000,
-                            MaxLength = 2000m,
-                            Occupied = false,
-                            SpacePortId = 1
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Fee = 5,
-                            MaxLength = 15m,
-                            Occupied = false,
-                            SpacePortId = 1
-                        });
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Payment", b =>
@@ -107,9 +67,6 @@ namespace WebApplication1.Migrations
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("ParkingId")
-                        .HasColumnType("int");
 
                     b.Property<bool>("Payed")
                         .HasColumnType("bit");
@@ -145,13 +102,6 @@ namespace WebApplication1.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Spaceports");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "DarkPark"
-                        });
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Parkings", b =>
