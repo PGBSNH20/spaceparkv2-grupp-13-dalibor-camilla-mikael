@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApplication1.Middleware;
 
 namespace WebApplication1
 {
@@ -51,6 +52,8 @@ namespace WebApplication1
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<ApiKeyMiddleware>();
 
             app.UseAuthorization();
 
